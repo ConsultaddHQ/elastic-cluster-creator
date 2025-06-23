@@ -7,7 +7,6 @@ variable "key_name" {
 }
 
 variable "key_pub_path" {
-  default = "/Users/vijay/.ssh/id_rsa.pub"
 }
 
 variable "instance_type" {
@@ -28,7 +27,7 @@ variable "data_count" {
   default = 1
 }
 
-variable "ingest_count" {
+variable "master_eligible" {
   type    = number
   default = 0
 }

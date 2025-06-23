@@ -11,5 +11,5 @@ output "data_ips" {
 }
 
 output "ingest_ips" {
-  value = [for instance in aws_instance.es_ingest : instance.public_ip]
+  value = [for instance in aws_instance.es_master_eligible : instance.public_ip]
 }

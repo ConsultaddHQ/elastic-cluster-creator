@@ -75,13 +75,13 @@ resource "aws_instance" "es_data" {
   }
 }
 
-resource "aws_instance" "es_ingest" {
-  count                  = var.ingest_count
+resource "aws_instance" "es_master_eligible" {
+  count                  = var.master_eligible
   ami                    = local.ami_id
   instance_type          = var.instance_type
   key_name               = var.key_name
   vpc_security_group_ids = [aws_security_group.elastic_sg.id]
   tags = {
-    Name = "${var.cluster_name}-ingest-node-${count.index + 1}"
+    Name = "${var.cluster_name}-master-eligible-node-${count.index + 1}"
   }
 }
