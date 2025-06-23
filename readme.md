@@ -1,3 +1,5 @@
+
+## Local Setup
 ### Create & Activate Virtual Environment
 
 #### 1. Create a virtual environment:
@@ -32,4 +34,13 @@ This will create a folder named `venv/` containing the virtual environment.
 
 ```bash
 pip install -r requirements.txt
+```
+
+## Create ELK Cluster
+```shell
+python main.py
+```
+## Destroy Cluster
+```shell
+terrafrom destroy
 ```
