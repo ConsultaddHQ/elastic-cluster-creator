@@ -16,12 +16,11 @@ variable "instance_type" {
 variable "ami_id_map" {
   type = map(string)
   default = {
-    "us-east-1"    = "ami-0c02fb55956c7d316"
-    "us-west-2"    = "ami-0885b1f6bd170450c"
-    "ap-south-1"   = "ami-0a0ad6b70e61be944"
+    "us-east-1"  = "ami-020cba7c55df1f615"    # Ubuntu 22.04 LTS
+    "us-west-2"  = "ami-05f991c49d264708f"    # Ubuntu 22.04 LTS
+    "ap-south-1" = "ami-0f918f7e67a3323f0"    # Ubuntu 22.04 LTS
   }
 }
-
 variable "data_count" {
   type    = number
   default = 1
