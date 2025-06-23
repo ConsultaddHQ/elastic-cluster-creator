@@ -1,2 +1,42 @@
 **.pem
 venv
+
+# Terraform state
+*.tfstate
+*.tfstate.backup
+
+# Terraform crash logs
+crash.log
+
+# Terraform variable override files
+*.tfvars
+*.tfvars.json
+
+# Sensitive files
+*.pem
+
+# Local Terraform directories
+.terraform/
+.terraform.lock.hcl
+
+# Terraform output
+terraform_output.json
+
+# Python bytecode or cache
+__pycache__/
+*.py[cod]
+
+# IDE/Editor junk
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS-generated
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log
+
+inventory.*
