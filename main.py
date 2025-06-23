@@ -2,6 +2,7 @@ import os
 import subprocess
 import json
 import yaml
+from pathlib import Path
 
 
 def prompt(message, default=None):
@@ -83,39 +84,64 @@ def generate_inventory(private_key_path):
     with open("inventory.yaml", "w") as f:
         yaml.dump(inventory, f, sort_keys=False)
 
+
 def main():
-    region = prompt("Enter AWS region", "us-east-1")
-    instance_type = prompt("Enter instance type", "t2.medium")
+    cloud = prompt("Choose cloud provider (aws/gcp)", "aws").lower()
+    if cloud not in {"aws", "gcp"}:
+        print("❌ Invalid cloud provider. Must be 'aws' or 'gcp'.")
+        exit(1)
+
+    os.chdir(Path(__file__).parent / cloud)
+
     cluster_name = prompt("Enter Elastic cluster name", "my-es-cluster")
-    master_eligible = prompt("Enter number of master eligible nodes", "1")
-    data_count = prompt("Enter number of data nodes", "2")
     key_name = f"{cluster_name}-ssh-key"
     private_key, public_key = create_ssh_keypair(key_name=key_name)
 
-    # Terraform init
+
+    if cloud == "aws":
+        region = prompt("Enter AWS region", "us-east-1")
+        instance_type = prompt("Enter instance type", "t2.medium")
+        master_eligible = prompt("Enter number of master eligible nodes", "1")
+        data_count = prompt("Enter number of data nodes", "2")
+
+        tf_apply_cmd = (
+            f'terraform apply -auto-approve '
+            f'-var="region={region}" '
+            f'-var="key_name={key_name}" '
+            f'-var="key_pub_path={public_key}" '
+            f'-var="instance_type={instance_type}" '
+            f'-var="data_count={data_count}" '
+            f'-var="master_eligible={master_eligible}" '
+            f'-var="cluster_name={cluster_name}"'
+        )
+
+    elif cloud == "gcp":
+        project_id = prompt("Enter GCP project ID")
+        region = prompt("Enter GCP region", "us-central1")
+        zone = prompt("Enter GCP zone", "us-central1-a")
+        instance_type = prompt("Enter GCP machine type", "e2-medium")
+
+        tf_apply_cmd = (
+            f'terraform apply -auto-approve '
+            f'-var="gcp_project_id={project_id}" '
+            f'-var="gcp_region={region}" '
+            f'-var="gcp_zone={zone}" '
+            f'-var="key_pub_path={public_key}" '
+            f'-var="instance_type={instance_type}" '
+            f'-var="cluster_name={cluster_name}"'
+        )
+
     run_command("terraform init")
+    run_command(tf_apply_cmd)
 
-    # Build apply command with vars
-    apply_cmd = (
-        f'terraform apply -auto-approve '
-        f'-var="region={region}" '
-        f'-var="key_name={key_name}" '
-        f'-var="key_pub_path={public_key}" '
-        f'-var="instance_type={instance_type}" '
-        f'-var="data_count={data_count}" '
-        f'-var="master_eligible={master_eligible}" '
-        f'-var="cluster_name={cluster_name}"'
-    )
-
-    run_command(apply_cmd)
-
-    # Save output as JSON
     output = run_command("terraform output -json", capture_output=True)
     with open("terraform_output.json", "w") as f:
         f.write(output)
+
     generate_inventory(private_key_path=private_key)
 
     print("✅ Terraform apply completed and outputs saved to terraform_output.json")
+
 
 if __name__ == "__main__":
     main()
