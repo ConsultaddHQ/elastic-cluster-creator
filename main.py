@@ -84,6 +84,23 @@ def generate_inventory(private_key_path):
     with open("inventory.yaml", "w") as f:
         yaml.dump(inventory, f, sort_keys=False)
 
+def get_extra_variables():
+    with open("terraform_output.json") as f:
+        data = json.load(f)
+
+    ips = []
+
+    # Append all IPs from the respective fields
+    ips += data.get("data_ips", {}).get("value", [])
+    ips += data.get("ingest_ips", {}).get("value", [])
+
+    master_ip = data.get("master_ip", {}).get("value")
+    if master_ip:
+        ips.append(master_ip)
+
+    return json.dumps({"es_seed_hosts": ips})
+
+
 
 def main():
     cloud = prompt("Choose cloud provider (aws/gcp)", "aws").lower()
@@ -142,8 +159,6 @@ def main():
     with open("terraform_output.json", "w") as f:
         f.write(output)
 
-    generate_inventory(private_key_path=private_key)
-
     print("✅ Terraform apply completed and outputs saved to terraform_output.json")
 
     print("Running Ansible playbook to configure Elasticsearch cluster")
@@ -155,6 +170,11 @@ def main():
     elif cloud == "gcp":
         run_command("ansible-playbook -i  ../gcp/inventory.yaml playbook.yaml")
 
+    generate_inventory(private_key_path=private_key)
+    extra_variables = get_extra_variables()
+    run_command(f"ansible-playbook -i inventory.yaml --extra-vars '{extra_variables}' ../ansible-role/playbook.yml")
+
 
 if __name__ == "__main__":
     main()
+
