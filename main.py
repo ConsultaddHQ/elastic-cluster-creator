@@ -169,7 +169,7 @@ def main():
     time.sleep(30)
 
     # Install ELK
-    run_command(f"ansible-playbook -i inventory.yaml --extra-vars '{extra_variables}' ../ansible-role/playbook.yml")
+    run_command(f"ansible-playbook -i inventory.yaml --extra-vars '{extra_variables}' ../ansible-role/playbook.yaml")
     
 
 if __name__ == "__main__":
