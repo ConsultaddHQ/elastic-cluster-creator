@@ -138,22 +138,3 @@
   when: "'elasticsearch_master' in group_names"
 
 
-
-# - name: Cluster enrollment token
-#   debug: 
-#     var: node_enrollment_token
-#   when: "'elasticsearch_master' in group_names"
-
-
-
-# - name: "Enroll Data Node to the cluster"
-#   command: /usr/share/elasticsearch/bin/elasticsearch-reconfigure-node --enrollment-token {{ hostvars[groups['elasticsearch_master'][0]].global_node_enrollment_token }}
-#   when: "'elasticsearch_data' in group_names"
-
-# - name: Enable and Start Elasticsearch on Data Node
-#   ansible.builtin.service:
-#     name: elasticsearch
-#     enabled: yes
-#     state: started
-#   when: "'elasticsearch_data' in group_names"
-
