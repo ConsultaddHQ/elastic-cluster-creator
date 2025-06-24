@@ -170,7 +170,7 @@ def main():
 
     # Install ELK
     run_command(f"ansible-playbook -i inventory.yaml --extra-vars '{extra_variables}' ../ansible-role/playbook.yml")
-
+    
 
 if __name__ == "__main__":
     main()
