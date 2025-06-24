@@ -1,0 +1,10 @@
+
+
+- name: Elasticsearch Configuration
+  import_tasks: 
+    file: elastic-config.yml
+
+- name: Kibana Configuration 
+  import_tasks: 
+    file: kibana-config.yml
+  when: "'elasticsearch_kibana' in group_names"

@@ -1,0 +1,18 @@
+#SPDX-License-Identifier: MIT-0
+---
+# defaults file for elastic-cluster
+
+elk_version: 8.1.3
+
+elastic_cluster_name: "my-elastic-cluster"
+
+# es_node_roles: ["master", "data"]
+
+es_seed_hosts:
+  - "44.220.150.255"
+  - "184.72.179.9"
+  - "34.233.124.19"
+  - "34.228.25.191"
+
+es_master_nodes:
+  - "master-node-1"
