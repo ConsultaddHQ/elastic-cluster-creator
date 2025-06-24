@@ -1,0 +1,159 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for elastic-cluster
+
+
+- name: Download Elasticsearch GPG key
+  get_url:
+    url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    dest: /tmp/GPG-KEY-elasticsearch
+    mode: '0644'
+
+- name: Convert GPG key and store it
+  command:
+    cmd: gpg --batch --yes --dearmor -o /usr/share/keyrings/elasticsearch-keyring.gpg /tmp/GPG-KEY-elasticsearch
+
+
+- name: "Install the apt-transport-https"
+  apt:
+    name: apt-transport-https
+    state: present
+
+- name: Add Elasticsearch APT repository
+  ansible.builtin.apt_repository:
+    repo: 'deb [signed-by=/usr/share/keyrings/elasticsearch-keyring.gpg] https://artifacts.elastic.co/packages/8.x/apt stable main'
+    state: present
+    filename: elastic-8.x
+
+- name: Update APT package cache
+  ansible.builtin.apt:
+    update_cache: yes
+
+- name: Install Elasticsearch
+  apt: 
+    name: elasticsearch={{ elk_version }}
+    state: present
+  register: install_output
+
+
+- name: "Update elasticsearch.yaml file"
+  template: 
+    src: elasticsearch.yml
+    dest: /etc/elasticsearch/elasticsearch.yml
+
+- name: Enable and Start Elasticsearch on Master Node
+  ansible.builtin.service:
+    name: elasticsearch
+    enabled: yes
+    state: started
+  when: "'elasticsearch_master' in group_names"
+
+
+- name: "Reset password of elastic user"
+  expect:
+    command: /usr/share/elasticsearch/bin/elasticsearch-reset-password -u elastic
+    responses:
+      "Please confirm that you would like to continue.*": "y"
+  register: elastic_user_password
+  when: "'elasticsearch_master' in group_names"
+  run_once: true
+
+
+- name: "Print elastic user password"
+  debug: var=elastic_user_password
+  when: "'elasticsearch_master' in group_names"
+  run_once: true
+
+
+- name: Generating Enrollment Token
+  shell: |
+    /usr/share/elasticsearch/bin/elasticsearch-create-enrollment-token -s node
+  register: enrollment_token
+  when: "'elasticsearch_master' in group_names"
+  run_once: true
+
+- name: "Printing enrollment token"
+  debug: var=enrollment_token.stdout
+  when: "'elasticsearch_master' in group_names"
+  run_once: true
+
+- name: "Generating Token for Kibana"
+  shell: |
+    /usr/share/elasticsearch/bin/elasticsearch-create-enrollment-token -s kibana
+  register: kibana_token
+  when: "'elasticsearch_master' in group_names"
+  run_once: true
+
+- name: "Printing token for kibana"
+  debug: var=kibana_token.stdout
+  when: "'elasticsearch_master' in group_names"
+  run_once: true
+
+
+
+# - name: Debug group_names
+#   debug:
+#     msg: "Host {{ inventory_hostname }} belongs to groups: {{ group_names }}"
+#   when: "'elasticsearch_master' in group_names" 
+
+- name: Extract elastic enrollment token from output
+  set_fact:
+    elastic_token: "{{ enrollment_token.stdout }}"
+  delegate_to: "{{ groups['elasticsearch_data'][0] }}"
+  delegate_facts: true
+  run_once: true
+ 
+
+# - name: out test
+#   debug:
+#     msg: "{{ hostvars[groups['elasticsearch_data'][0]]['elastic_token'] }}"
+#   when: "'elasticsearch_master_eligible' in group_names or 'elasticsearch_data' in group_names"
+
+- name: Set enrollment token for other nodes
+  expect:
+    command: /usr/share/elasticsearch/bin/elasticsearch-reconfigure-node --enrollment-token "{{ hostvars[groups['elasticsearch_data'][0]]['elastic_token'] }}"
+    responses:
+      "Do you want to continue with the reconfiguration process.*": "y"
+  when: "'elasticsearch_master_eligible' in group_names or 'elasticsearch_data' in group_names"
+
+
+- name: Update master-eligible node roles
+  template: 
+    src: master-eligible-elasticsearch.yml
+    dest: /etc/elasticsearch/elasticsearch.yml
+  when: "'elasticsearch_master_eligible' in group_names"
+
+- name: Enable and Start Elasticsearch on Data Node and Master-Eligible Node
+  ansible.builtin.service:
+    name: elasticsearch
+    enabled: yes
+    state: started
+  when: "'elasticsearch_master_eligible' in group_names or 'elasticsearch_data' in group_names"
+
+
+- name: Update master node elastic config to remove initial master node setting
+  template: 
+    src: master-final-elasticsearch.yml
+    dest: /etc/elasticsearch/elasticsearch.yml
+  when: "'elasticsearch_master' in group_names"
+
+
+
+# - name: Cluster enrollment token
+#   debug: 
+#     var: node_enrollment_token
+#   when: "'elasticsearch_master' in group_names"
+
+
+
+# - name: "Enroll Data Node to the cluster"
+#   command: /usr/share/elasticsearch/bin/elasticsearch-reconfigure-node --enrollment-token {{ hostvars[groups['elasticsearch_master'][0]].global_node_enrollment_token }}
+#   when: "'elasticsearch_data' in group_names"
+
+# - name: Enable and Start Elasticsearch on Data Node
+#   ansible.builtin.service:
+#     name: elasticsearch
+#     enabled: yes
+#     state: started
+#   when: "'elasticsearch_data' in group_names"
+
