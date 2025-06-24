@@ -163,17 +163,16 @@ def main():
 
     print("Running Ansible playbook to configure Elasticsearch cluster")
     os.chdir("../ansible-role")
-
-    if cloud == "aws":
-        run_command("ansible-playbook -i  ../aws/inventory.yaml playbook.yaml")
-    
-    elif cloud == "gcp":
-        run_command("ansible-playbook -i  ../gcp/inventory.yaml playbook.yaml")
-
     generate_inventory(private_key_path=private_key)
     extra_variables = get_extra_variables()
-    run_command(f"ansible-playbook -i inventory.yaml --extra-vars '{extra_variables}' ../ansible-role/playbook.yml")
 
+    if cloud == "aws":
+        run_command(f"ansible-playbook -i ../aws/inventory.yaml --extra-vars '{extra_variables}' ../ansible-role/playbook.yml")
+    
+    elif cloud == "gcp":
+        run_command(f"ansible-playbook -i ../gcp/inventory.yaml --extra-vars '{extra_variables}' ../ansible-role/playbook.yml")
+
+    
 
 if __name__ == "__main__":
     main()
