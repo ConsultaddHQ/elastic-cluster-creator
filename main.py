@@ -98,7 +98,7 @@ def get_extra_variables():
     if master_ip:
         ips.append(master_ip)
 
-    return json.dumps({"es_seed_hosts": ips,"ips":ips})
+    return json.dumps({"es_seed_hosts": ips})
 
 
 
@@ -163,8 +163,7 @@ def main():
 
     generate_inventory(private_key_path=private_key)
     extra_variables = get_extra_variables()
-    os.chdir(Path(__file__).parent / 'ansible-role')
-    run_command(f"ansible-playbook -i inventory.yaml --extra-vars '{extra_variables}' ../ansible-role/site.yml")
+    run_command(f"ansible-playbook -i inventory.yaml --extra-vars '{extra_variables}' ../ansible-role/playbook.yml")
 
 
 if __name__ == "__main__":
