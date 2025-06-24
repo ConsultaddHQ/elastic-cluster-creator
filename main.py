@@ -120,6 +120,8 @@ def main():
         region = prompt("Enter GCP region", "us-central1")
         zone = prompt("Enter GCP zone", "us-central1-a")
         instance_type = prompt("Enter GCP machine type", "e2-medium")
+        master_eligible = prompt("Enter number of master eligible nodes", "1")
+        data_count = prompt("Enter number of data nodes", "2")
 
         tf_apply_cmd = (
             f'terraform apply -auto-approve '
@@ -128,6 +130,8 @@ def main():
             f'-var="gcp_zone={zone}" '
             f'-var="key_pub_path={public_key}" '
             f'-var="instance_type={instance_type}" '
+            f'-var="data_count={data_count}" '
+            f'-var="master_eligible={master_eligible}" '
             f'-var="cluster_name={cluster_name}"'
         )
 
