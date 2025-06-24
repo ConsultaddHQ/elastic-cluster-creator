@@ -1,16 +1,38 @@
+# ELK Cluster Creator
+
+## Prerequisites
+
+Make sure the following tools are installed before proceeding:
+
+* [Terraform](https://www.terraform.io/downloads.html)
+* [Python 3.x](https://www.python.org/downloads/)
+
+### For AWS Cloud
+
+* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html)
+* AWS credentials configured using:
+
+  ```bash
+  aws configure
+  ```
+
+### For GCP Cloud
+
+* GCP service account JSON key file
+
+---
 
 ## Local Setup
-### Create & Activate Virtual Environment
 
-#### 1. Create a virtual environment:
+### 1. Create & Activate Virtual Environment
 
 ```bash
 python3 -m venv venv
 ```
 
-This will create a folder named `venv/` containing the virtual environment.
+This creates a folder named `venv/` containing the virtual environment.
 
-#### 2. Activate the virtual environment:
+Activate the virtual environment:
 
 * On **macOS/Linux**:
 
@@ -30,17 +52,24 @@ This will create a folder named `venv/` containing the virtual environment.
   venv\Scripts\Activate.ps1
   ```
 
-#### 3. Install dependencies:
+### 2. Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
+---
+
 ## Create ELK Cluster
-```shell
+
+```bash
 python main.py
 ```
+
+---
+
 ## Destroy Cluster
-```shell
-terrafrom destroy
+
+```bash
+python destroy.py
 ```
