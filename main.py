@@ -1,10 +1,18 @@
+import json
 import os
 import subprocess
-import json
-import yaml
 import time
 from pathlib import Path
+import yaml
 
+
+def write_tfvars_file(values: dict):
+    with open("terraform.tfvars", "w") as f:
+        for key, value in values.items():
+            if isinstance(value, str):
+                f.write(f'{key} = "{value}"\n')
+            else:
+                f.write(f"{key} = {value}\n")
 
 def prompt(message, default=None):
     val = input(f"{message} (default: {default}): ").strip()
@@ -115,46 +123,34 @@ def main():
     key_name = f"{cluster_name}-ssh-key"
     private_key, public_key = create_ssh_keypair(key_name=key_name)
 
+    tfvars = {
+        "cluster_name": cluster_name,
+        "key_pub_path": public_key,
+    }
 
     if cloud == "aws":
-        region = prompt("Enter AWS region", "us-east-1")
-        instance_type = prompt("Enter instance type", "t2.medium")
-        master_eligible = prompt("Enter number of master eligible nodes", "1")
-        data_count = prompt("Enter number of data nodes", "2")
-
-        tf_apply_cmd = (
-            f'terraform apply -auto-approve '
-            f'-var="region={region}" '
-            f'-var="key_name={key_name}" '
-            f'-var="key_pub_path={public_key}" '
-            f'-var="instance_type={instance_type}" '
-            f'-var="data_count={data_count}" '
-            f'-var="master_eligible={master_eligible}" '
-            f'-var="cluster_name={cluster_name}"'
-        )
+        tfvars.update({
+            "region": prompt("Enter AWS region", "us-east-1"),
+            "key_name": key_name,
+            "instance_type": prompt("Enter instance type", "t2.medium"),
+            "master_eligible": int(prompt("Enter number of master eligible nodes", "1")),
+            "data_count": int(prompt("Enter number of data nodes", "2")),
+        })
 
     elif cloud == "gcp":
-        project_id = prompt("Enter GCP project ID")
-        region = prompt("Enter GCP region", "us-central1")
-        zone = prompt("Enter GCP zone", "us-central1-a")
-        instance_type = prompt("Enter GCP machine type", "e2-medium")
-        master_eligible = prompt("Enter number of master eligible nodes", "1")
-        data_count = prompt("Enter number of data nodes", "2")
+        tfvars.update({
+            "gcp_project_id": prompt("Enter GCP project ID"),
+            "gcp_region": prompt("Enter GCP region", "us-central1"),
+            "gcp_zone": prompt("Enter GCP zone", "us-central1-a"),
+            "instance_type": prompt("Enter GCP machine type", "e2-medium"),
+            "master_eligible": int(prompt("Enter number of master eligible nodes", "1")),
+            "data_count": int(prompt("Enter number of data nodes", "2")),
+        })
 
-        tf_apply_cmd = (
-            f'terraform apply -auto-approve '
-            f'-var="gcp_project_id={project_id}" '
-            f'-var="gcp_region={region}" '
-            f'-var="gcp_zone={zone}" '
-            f'-var="key_pub_path={public_key}" '
-            f'-var="instance_type={instance_type}" '
-            f'-var="data_count={data_count}" '
-            f'-var="master_eligible={master_eligible}" '
-            f'-var="cluster_name={cluster_name}"'
-        )
+    write_tfvars_file(tfvars)
 
     run_command("terraform init")
-    run_command(tf_apply_cmd)
+    run_command('terraform apply -auto-approve -var-file="terraform.tfvars"')
 
     output = run_command("terraform output -json", capture_output=True)
     with open("terraform_output.json", "w") as f:
@@ -165,10 +161,8 @@ def main():
     generate_inventory(private_key_path=private_key)
     extra_variables = get_extra_variables()
 
-    # wait 30s for instances to boot up and ready for ssh connection
-    time.sleep(30)
+    time.sleep(30)  # wait for SSH to be ready
 
-    # Install ELK
     run_command(f"ansible-playbook -i inventory.yaml --extra-vars '{extra_variables}' ../ansible-role/playbook.yaml")
     
 

@@ -26,7 +26,7 @@ def main():
 
     os.chdir(Path(__file__).parent / cloud)
 
-    run_command("terraform destroy")
+    run_command('terraform destroy -var-file="terraform.tfvars"')
 
     print("✅ Terraform destroy completed")
 
