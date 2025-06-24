@@ -6,6 +6,7 @@ Make sure the following tools are installed before proceeding:
 
 * [Terraform](https://www.terraform.io/downloads.html)
 * [Python 3.x](https://www.python.org/downloads/)
+* [Ansible Playbook](https://docs.ansible.com/ansible/latest/getting_started/index.html)
 
 ### For AWS Cloud
 
