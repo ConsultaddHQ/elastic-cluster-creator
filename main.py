@@ -161,6 +161,15 @@ def main():
 
     print("✅ Terraform apply completed and outputs saved to terraform_output.json")
 
+    print("Running Ansible playbook to configure Elasticsearch cluster")
+    os.chdir("../ansible-role")
+
+    if cloud == "aws":
+        run_command("ansible-playbook -i  ../aws/inventory.yaml playbook.yaml")
+    
+    elif cloud == "gcp":
+        run_command("ansible-playbook -i  ../gcp/inventory.yaml playbook.yaml")
+
     generate_inventory(private_key_path=private_key)
     extra_variables = get_extra_variables()
     run_command(f"ansible-playbook -i inventory.yaml --extra-vars '{extra_variables}' ../ansible-role/playbook.yml")
