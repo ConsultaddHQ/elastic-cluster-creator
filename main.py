@@ -2,6 +2,7 @@ import os
 import subprocess
 import json
 import yaml
+import time
 from pathlib import Path
 
 
@@ -163,6 +164,11 @@ def main():
 
     generate_inventory(private_key_path=private_key)
     extra_variables = get_extra_variables()
+
+    # wait 30s for instances to boot up and ready for ssh connection
+    time.sleep(30)
+
+    # Install ELK
     run_command(f"ansible-playbook -i inventory.yaml --extra-vars '{extra_variables}' ../ansible-role/playbook.yml")
 
 
