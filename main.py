@@ -98,7 +98,7 @@ def get_extra_variables():
     if master_ip:
         ips.append(master_ip)
 
-    return json.dumps({"es_seed_hosts": ips})
+    return json.dumps({"es_seed_hosts": ips,"ips":ips})
 
 
 
@@ -159,12 +159,14 @@ def main():
     with open("terraform_output.json", "w") as f:
         f.write(output)
 
+    print("✅ Terraform apply completed and outputs saved to terraform_output.json")
+
     generate_inventory(private_key_path=private_key)
     extra_variables = get_extra_variables()
-
-
-    print("✅ Terraform apply completed and outputs saved to terraform_output.json")
+    os.chdir(Path(__file__).parent / 'ansible-role')
+    run_command(f"ansible-playbook -i inventory.yaml --extra-vars '{extra_variables}' ../ansible-role/site.yml")
 
 
 if __name__ == "__main__":
     main()
+
