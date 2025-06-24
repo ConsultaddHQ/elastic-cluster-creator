@@ -147,12 +147,12 @@ def main():
     print("✅ Terraform apply completed and outputs saved to terraform_output.json")
 
     print("Running Ansible playbook to configure Elasticsearch cluster")
+    os.chdir("../ansible-role")
+
     if cloud == "aws":
-        run_command("cd ../ansible-role")
         run_command("ansible-playbook -i  ../aws/inventory.yaml playbook.yaml")
     
     elif cloud == "gcp":
-        run_command("cd ../ansible-role")
         run_command("ansible-playbook -i  ../gcp/inventory.yaml playbook.yaml")
 
 
