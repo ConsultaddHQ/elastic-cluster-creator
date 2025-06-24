@@ -2,6 +2,7 @@ import os
 import subprocess
 import json
 import yaml
+import time
 from pathlib import Path
 
 
@@ -161,17 +162,14 @@ def main():
 
     print("✅ Terraform apply completed and outputs saved to terraform_output.json")
 
-    print("Running Ansible playbook to configure Elasticsearch cluster")
-    os.chdir("../ansible-role")
     generate_inventory(private_key_path=private_key)
     extra_variables = get_extra_variables()
 
-    if cloud == "aws":
-        run_command(f"ansible-playbook -i ../aws/inventory.yaml --extra-vars '{extra_variables}' playbook.yml")
-    
-    elif cloud == "gcp":
-        run_command(f"ansible-playbook -i ../gcp/inventory.yaml --extra-vars '{extra_variables}' playbook.yml")
+    # wait 30s for instances to boot up and ready for ssh connection
+    time.sleep(30)
 
+    # Install ELK
+    run_command(f"ansible-playbook -i inventory.yaml --extra-vars '{extra_variables}' ../ansible-role/playbook.yaml")
     
 
 if __name__ == "__main__":
