@@ -45,3 +45,12 @@
   when: "'elasticsearch_kibana' in group_names"
 
 
+- name: Generating kibana verification code
+  shell: |
+    /usr/share/kibana/bin/kibana-verification-code 
+  register: kibana_verification_code
+  when: "'elasticsearch_kibana' in group_names"
+
+- name: "Printing kibana verification code"
+  debug: var=kibana_verification_code.stdout
+  when: "'elasticsearch_kibana' in group_names"
