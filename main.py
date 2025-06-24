@@ -167,10 +167,10 @@ def main():
     extra_variables = get_extra_variables()
 
     if cloud == "aws":
-        run_command(f"ansible-playbook -i ../aws/inventory.yaml --extra-vars '{extra_variables}' ../ansible-role/playbook.yml")
+        run_command(f"ansible-playbook -i ../aws/inventory.yaml --extra-vars '{extra_variables}' playbook.yml")
     
     elif cloud == "gcp":
-        run_command(f"ansible-playbook -i ../gcp/inventory.yaml --extra-vars '{extra_variables}' ../ansible-role/playbook.yml")
+        run_command(f"ansible-playbook -i ../gcp/inventory.yaml --extra-vars '{extra_variables}' playbook.yml")
 
     
 
