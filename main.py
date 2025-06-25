@@ -101,7 +101,7 @@ def get_extra_variables():
 
     # Append all IPs from the respective fields
     ips += data.get("data_ips", {}).get("value", [])
-    ips += data.get("ingest_ips", {}).get("value", [])
+    ips += data.get("master_ip", {}).get("value")
 
     master_ip = data.get("master_ip", {}).get("value")
     if master_ip:
@@ -145,6 +145,7 @@ def main():
             "instance_type": prompt("Enter GCP machine type", "e2-medium"),
             "master_eligible": int(prompt("Enter number of master eligible nodes", "1")),
             "data_count": int(prompt("Enter number of data nodes", "2")),
+            "gcp_credentials_file": prompt("Enter GCP JSON Credential file path")
         })
 
     write_tfvars_file(tfvars)
@@ -164,7 +165,6 @@ def main():
     time.sleep(30)  # wait for SSH to be ready
 
     run_command(f"ansible-playbook -i inventory.yaml --extra-vars '{extra_variables}' ../ansible-role/playbook.yaml")
-    
 
 if __name__ == "__main__":
     main()
