@@ -1,4 +1,27 @@
-# ELK Cluster Creator
+# 🔧 ELK Cluster Provisioning Tool
+This tool automates the provisioning and setup of an Elasticsearch cluster with configurable node roles on your choice of cloud provider—AWS EC2 or GCP Compute Engine.
+
+🚀 Features
+* Spin up a complete ELK cluster with:
+
+  * Configurable number of data, ingest, and master nodes
+
+  * Optional Kibana setup
+
+* Deploy infrastructure on AWS or GCP
+
+* Automated installation and configuration of Elasticsearch and Kibana
+
+* Built-in support for X-Pack Security
+
+* Generates a dynamic Ansible inventory from cloud resources
+
+* Simplifies cluster management for developers, testers, and SREs
+
+💡 Ideal For
+* Quick local or cloud-based ELK cluster setups
+
+* Testing ELK performance with different node configurations
 
 ## Prerequisites
 
