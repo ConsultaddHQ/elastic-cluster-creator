@@ -10,6 +10,6 @@ output "data_ips" {
   value = [for instance in aws_instance.es_data : instance.public_ip]
 }
 
-output "ingest_ips" {
+output "master_eligible_ips" {
   value = [for instance in aws_instance.es_master_eligible : instance.public_ip]
 }
