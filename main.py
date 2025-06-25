@@ -131,7 +131,7 @@ def main():
         tfvars.update({
             "region": prompt("Enter AWS region", "us-east-1"),
             "key_name": key_name,
-            "instance_type": prompt("Enter instance type", "t2.medium"),
+            "instance_type": prompt("Enter instance type", "t2.large"),
             "master_eligible": int(prompt("Enter number of master eligible nodes", "1")),
             "data_count": int(prompt("Enter number of data nodes", "2")),
         })
