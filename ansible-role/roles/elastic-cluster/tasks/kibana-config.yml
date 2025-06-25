@@ -1,30 +1,4 @@
-
-
-- name: Download Elasticsearch GPG key
-  get_url:
-    url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
-    dest: /tmp/GPG-KEY-elasticsearch
-    mode: '0644'
-
-- name: Convert GPG key and store it
-  command:
-    cmd: gpg --batch --yes --dearmor -o /usr/share/keyrings/elasticsearch-keyring.gpg /tmp/GPG-KEY-elasticsearch
-
-- name: "Install the apt-transport-https"
-  apt:
-    name: apt-transport-https
-    state: present
-
-- name: Add Elasticsearch APT repository
-  ansible.builtin.apt_repository:
-    repo: 'deb [signed-by=/usr/share/keyrings/elasticsearch-keyring.gpg] https://artifacts.elastic.co/packages/8.x/apt stable main'
-    state: present
-    filename: elastic-8.x
-
-- name: Update APT package cache
-  ansible.builtin.apt:
-    update_cache: yes
-  
+---
 - name: Install Kibana
   apt: 
     name: kibana={{ elk_version }}
@@ -44,13 +18,15 @@
     state: started
   when: "'elasticsearch_kibana' in group_names"
 
-
-- name: Generating kibana verification code
-  shell: |
-    /usr/share/kibana/bin/kibana-verification-code 
+- name: Wait for Kibana verification code to appear in logs
+  ansible.builtin.shell: journalctl -u kibana --no-pager | grep "verification code"
   register: kibana_verification_code
-  when: "'elasticsearch_kibana' in group_names"
+  retries: 50
+  delay: 10
+  until: kibana_verification_code.stdout != ""
+  changed_when: false
 
-- name: "Printing kibana verification code"
-  debug: var=kibana_verification_code.stdout
-  when: "'elasticsearch_kibana' in group_names"
+
+- name: Show Kibana verification code
+  ansible.builtin.debug:
+    var: kibana_verification_code.stdout

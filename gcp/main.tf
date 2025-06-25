@@ -10,7 +10,7 @@ resource "google_compute_firewall" "elastic_fw" {
 
   allow {
     protocol = "tcp"
-    ports    = ["22", "9200", "5601"]
+    ports    = ["22", "9200", "5601","9300"]
   }
 
   source_ranges = ["0.0.0.0/0"]

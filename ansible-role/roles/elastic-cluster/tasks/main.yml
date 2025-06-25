@@ -1,8 +1,12 @@
 
+- name: Common Setup
+  import_tasks:
+    file: common.yml
 
 - name: Elasticsearch Configuration
   import_tasks: 
     file: elastic-config.yml
+  when: "'elasticsearch_kibana' not in group_names"
 
 - name: Kibana Configuration 
   import_tasks: 
