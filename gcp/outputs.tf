@@ -10,6 +10,6 @@ output "data_ips" {
   value = [for inst in google_compute_instance.es_data : inst.network_interface[0].access_config[0].nat_ip]
 }
 
-output "ingest_ips" {
+output "master_eligible_ips" {
   value = [for inst in google_compute_instance.es_master_eligible : inst.network_interface[0].access_config[0].nat_ip]
 }

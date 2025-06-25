@@ -81,7 +81,7 @@ def generate_inventory(private_key_path):
                         'elasticsearch_master_eligible': {
                             'hosts': {
                                 f'master-eligible-{i+1}': {'ansible_host': ip}
-                                for i, ip in enumerate(data['ingest_ips']['value'])
+                                for i, ip in enumerate(data['master_eligible_ips']['value'])
                             }
                         }
                     }
@@ -100,8 +100,7 @@ def get_extra_variables():
     ips = []
 
     # Append all IPs from the respective fields
-    ips += data.get("data_ips", {}).get("value", [])
-    ips += data.get("master_ip", {}).get("value")
+    ips += data.get("master_eligible_ips", {}).get("value", [])
 
     master_ip = data.get("master_ip", {}).get("value")
     if master_ip:
