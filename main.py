@@ -133,7 +133,7 @@ def main():
             "key_name": key_name,
             "instance_type": prompt("Enter instance type", "t2.large"),
             "master_eligible": int(prompt("Enter number of master eligible nodes", "1")),
-            "data_count": int(prompt("Enter number of data nodes", "2")),
+            "data_count": int(prompt("Enter number of data nodes", "1")),
         })
 
     elif cloud == "gcp":
@@ -143,7 +143,7 @@ def main():
             "gcp_zone": prompt("Enter GCP zone", "us-central1-a"),
             "instance_type": prompt("Enter GCP machine type", "e2-medium"),
             "master_eligible": int(prompt("Enter number of master eligible nodes", "1")),
-            "data_count": int(prompt("Enter number of data nodes", "2")),
+            "data_count": int(prompt("Enter number of data nodes", "1")),
             "gcp_credentials_file": prompt("Enter GCP JSON Credential file path")
         })
 
