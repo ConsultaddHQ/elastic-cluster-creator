@@ -161,7 +161,8 @@ def main():
     generate_inventory(private_key_path=private_key)
     extra_variables = get_extra_variables()
 
-    time.sleep(30)  # wait for SSH to be ready
+    print("⏳ Waiting for 45s to get SSH to ready")
+    time.sleep(45)  # wait for SSH to be ready
 
     run_command(f"ansible-playbook -i inventory.yaml --extra-vars '{extra_variables}' ../ansible-role/playbook.yaml")
 
