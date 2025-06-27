@@ -47,15 +47,44 @@ resource "aws_security_group" "elastic_sg" {
   }
 }
 
+resource "aws_iam_role" "s3_write_role" {
+  name = "${var.cluster_name}-s3-write-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        },
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_instance_profile" "s3_write_profile" {
+  name = "${var.cluster_name}-s3-write-profile"
+  role = aws_iam_role.s3_write_role.name
+}
+
+# --------------------
+# Local AMI ID
+# --------------------
 locals {
   ami_id = var.ami_id_map[var.region]
 }
 
+# --------------------
+# EC2 Instances
+# --------------------
 resource "aws_instance" "es_master" {
   ami                    = local.ami_id
   instance_type          = var.instance_type
   key_name               = var.key_name
   vpc_security_group_ids = [aws_security_group.elastic_sg.id]
+  iam_instance_profile   = aws_iam_instance_profile.s3_write_profile.name
   tags = {
     Name = "${var.cluster_name}-master-node"
   }
@@ -66,6 +95,7 @@ resource "aws_instance" "es_kibana" {
   instance_type          = var.instance_type
   key_name               = var.key_name
   vpc_security_group_ids = [aws_security_group.elastic_sg.id]
+  iam_instance_profile   = aws_iam_instance_profile.s3_write_profile.name
   tags = {
     Name = "${var.cluster_name}-kibana-node"
   }
@@ -77,6 +107,7 @@ resource "aws_instance" "es_data" {
   instance_type          = var.instance_type
   key_name               = var.key_name
   vpc_security_group_ids = [aws_security_group.elastic_sg.id]
+  iam_instance_profile   = aws_iam_instance_profile.s3_write_profile.name
   tags = {
     Name = "${var.cluster_name}-data-node-${count.index + 1}"
   }
@@ -88,6 +119,7 @@ resource "aws_instance" "es_master_eligible" {
   instance_type          = var.instance_type
   key_name               = var.key_name
   vpc_security_group_ids = [aws_security_group.elastic_sg.id]
+  iam_instance_profile   = aws_iam_instance_profile.s3_write_profile.name
   tags = {
     Name = "${var.cluster_name}-master-eligible-node-${count.index + 1}"
   }
