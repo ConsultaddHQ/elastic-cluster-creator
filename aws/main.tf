@@ -75,7 +75,6 @@ resource "aws_iam_instance_profile" "s3_write_profile" {
 locals {
   ami_id = var.ami_id_map[var.region]
 }
-
 # --------------------
 # EC2 Instances
 # --------------------
@@ -85,6 +84,12 @@ resource "aws_instance" "es_master" {
   key_name               = var.key_name
   vpc_security_group_ids = [aws_security_group.elastic_sg.id]
   iam_instance_profile   = aws_iam_instance_profile.s3_write_profile.name
+
+  root_block_device {
+    volume_size = 20
+    volume_type = "gp3"
+  }
+
   tags = {
     Name = "${var.cluster_name}-master-node"
   }
@@ -96,6 +101,12 @@ resource "aws_instance" "es_kibana" {
   key_name               = var.key_name
   vpc_security_group_ids = [aws_security_group.elastic_sg.id]
   iam_instance_profile   = aws_iam_instance_profile.s3_write_profile.name
+
+  root_block_device {
+    volume_size = 20
+    volume_type = "gp3"
+  }
+
   tags = {
     Name = "${var.cluster_name}-kibana-node"
   }
@@ -108,6 +119,12 @@ resource "aws_instance" "es_data" {
   key_name               = var.key_name
   vpc_security_group_ids = [aws_security_group.elastic_sg.id]
   iam_instance_profile   = aws_iam_instance_profile.s3_write_profile.name
+
+  root_block_device {
+    volume_size = 20
+    volume_type = "gp3"
+  }
+
   tags = {
     Name = "${var.cluster_name}-data-node-${count.index + 1}"
   }
@@ -120,6 +137,12 @@ resource "aws_instance" "es_master_eligible" {
   key_name               = var.key_name
   vpc_security_group_ids = [aws_security_group.elastic_sg.id]
   iam_instance_profile   = aws_iam_instance_profile.s3_write_profile.name
+
+  root_block_device {
+    volume_size = 20
+    volume_type = "gp3"
+  }
+
   tags = {
     Name = "${var.cluster_name}-master-eligible-node-${count.index + 1}"
   }

@@ -6,13 +6,13 @@ provider "google" {
 
 # Create Service Account
 resource "google_service_account" "elk_sa" {
-  account_id   = "${var.cluster_name}-service-account"
+  account_id   = "${var.cluster_name}-sa"
   display_name = "${var.cluster_name} Service Account"
 }
 
 # Firewall Rule
 resource "google_compute_firewall" "elastic_fw" {
-  name    = "elastic-cluster-fw"
+  name    = "${var.cluster_name}-fw"
   network = "default"
 
   allow {
@@ -36,7 +36,7 @@ resource "google_compute_instance" "es_master" {
   }
 
   network_interface {
-    network       = "default"
+    network = "default"
     access_config {}
   }
 
@@ -64,7 +64,7 @@ resource "google_compute_instance" "es_kibana" {
   }
 
   network_interface {
-    network       = "default"
+    network = "default"
     access_config {}
   }
 
@@ -94,7 +94,7 @@ resource "google_compute_instance" "es_data" {
   }
 
   network_interface {
-    network       = "default"
+    network = "default"
     access_config {}
   }
 
@@ -124,7 +124,7 @@ resource "google_compute_instance" "es_master_eligible" {
   }
 
   network_interface {
-    network       = "default"
+    network = "default"
     access_config {}
   }
 
