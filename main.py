@@ -100,9 +100,9 @@ def get_extra_variables():
     ips = []
 
     # Append all IPs from the respective fields
-    ips += data.get("master_eligible_ips", {}).get("value", [])
+    ips += data.get("master_eligible_private_ips", {}).get("value", [])
 
-    master_ip = data.get("master_ip", {}).get("value")
+    master_ip = data.get("master_private_ip", {}).get("value")
     if master_ip:
         ips.append(master_ip)
 
